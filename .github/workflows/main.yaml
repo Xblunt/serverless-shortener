@@ -83,14 +83,17 @@ jobs:
             npx tsc --build tsconfig.json
           fi
 
-      # - name: Debug list files before copy
-      #   run: ls -la
 
-      # - name: Copy required files
-      #   run: |
-      #     cp package.json ./dist/
-      #     [ -f "key.json" ] && cp "key.json" ./dist/
-      #     [ -f "index.js" ] && cp "index.js" ./dist/
+
+      - name: Debug list files before copy
+        run: ls -la
+
+      - name: Copy required files
+        run: |
+          [ -f "key.json" ] && cp "key.json" ./dist/
+          [ -f "index.js" ] && cp "index.js" ./dist/
+          cp package.json ./dist/
+          
 
       - name: Debug dist content
         run: ls -la ./dist
