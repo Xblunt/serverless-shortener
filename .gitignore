@@ -1,3 +1,10 @@
 .idea
 node_modules
 key.json
+build-create.sh
+create-func.sh
+create-ver.sh
+redirect-ver.sh
+redirect-func.sh
+delete-func.sh
+delete-ver.dist
