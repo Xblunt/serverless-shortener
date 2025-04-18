@@ -29,27 +29,27 @@ jobs:
       - name: Build project
         run: npm run build
 
-      - name: Postbuild project
-        run: npm run postbuild
+      - name: Run zipper
+        run: ./zipper.sh
 
-  archive-master:
-    name: Archive Master
-    needs: build
-    if: github.ref == 'refs/heads/master'
-    runs-on: ubuntu-latest
+  # archive-master:
+  #   name: Archive Master
+  #   needs: build
+  #   if: github.ref == 'refs/heads/master'
+  #   runs-on: ubuntu-latest
 
-    steps:
-      - name: Clean previous builds
-        run: rm -rf ./build && mkdir -p ./build
+  #   steps:
+  #     - name: Clean previous builds
+  #       run: rm -rf ./build && mkdir -p ./build
 
-      - name: Prepare dist directory
-        run: mkdir -p ./dist
+  #     - name: Prepare dist directory
+  #       run: mkdir -p ./dist
 
-      - name: Compile TypeScript (if needed)
-        run: |
-          if [ -f "tsconfig.json" ]; then
-            npx tsc --build tsconfig.json
-          fi
+  #     - name: Compile TypeScript (if needed)
+  #       run: |
+  #         if [ -f "tsconfig.json" ]; then
+  #           npx tsc --build tsconfig.json
+  #         fi
 
       # - name: Debug list files before copy
       #   run: ls -la
@@ -61,86 +61,86 @@ jobs:
       #     # Убедись, что index.js находится в ./dist
       #     [ -f "index.js" ] && cp "index.js" ./dist/
 
-      - name: Debug dist content
-        run: ls -la ./dist
+      # - name: Debug dist content
+      #   run: ls -la ./dist
 
-      - name: Create ZIP archive
-        run: cd ./dist && zip -r "../build/function.zip" . -x "*node_modules*"
+      # - name: Create ZIP archive
+      #   run: cd ./dist && zip -r "../build/function.zip" . -x "*node_modules*"
 
-  archive-shorten:
-    name: Archive Shorten
-    needs: build
-    if: github.ref == 'refs/heads/shorten'
-    runs-on: ubuntu-latest
+  # archive-shorten:
+  #   name: Archive Shorten
+  #   needs: build
+  #   if: github.ref == 'refs/heads/shorten'
+  #   runs-on: ubuntu-latest
 
-    steps:
-      - name: Clean previous builds
-        run: rm -rf ./build && mkdir -p ./build
+  #   steps:
+  #     - name: Clean previous builds
+  #       run: rm -rf ./build && mkdir -p ./build
 
-      - name: Prepare dist directory
-        run: mkdir -p ./dist
+  #     - name: Prepare dist directory
+  #       run: mkdir -p ./dist
 
-      - name: Compile TypeScript (if needed)
-        run: |
-          if [ -f "tsconfig.json" ]; then
-            npx tsc --build tsconfig.json
-          fi
+  #     - name: Compile TypeScript (if needed)
+  #       run: |
+  #         if [ -f "tsconfig.json" ]; then
+  #           npx tsc --build tsconfig.json
+  #         fi
 
 
 
-      # - name: Debug list files before copy
-      #   run: ls -la
+  #     # - name: Debug list files before copy
+  #     #   run: ls -la
 
-      # - name: Copy required files
-      #   run: |
-      #     [ -f "key.json" ] && cp "key.json" ./dist/
-      #      [ -f "package.json" ] && cp "package.json" ./dist/
+  #     # - name: Copy required files
+  #     #   run: |
+  #     #     [ -f "key.json" ] && cp "key.json" ./dist/
+  #     #      [ -f "package.json" ] && cp "package.json" ./dist/
 
           
 
-      - name: Debug dist content
-        run: ls -la ./dist
+  #     - name: Debug dist content
+  #       run: ls -la ./dist
 
-      - name: Create ZIP archive
-        run: cd ./dist && zip -r "../build/function.zip" . -x "*node_modules*"
+  #     - name: Create ZIP archive
+  #       run: cd ./dist && zip -r "../build/function.zip" . -x "*node_modules*"
 
-  archive-delete:
-    name: Archive Delete
-    needs: build
-    if: github.ref == 'refs/heads/delete'
-    runs-on: ubuntu-latest
+  # archive-delete:
+  #   name: Archive Delete
+  #   needs: build
+  #   if: github.ref == 'refs/heads/delete'
+  #   runs-on: ubuntu-latest
 
-    steps:
-      - name: Clean previous builds
-        run: rm -rf ./build && mkdir -p ./build
+  #   steps:
+  #     - name: Clean previous builds
+  #       run: rm -rf ./build && mkdir -p ./build
 
-      - name: Prepare dist directory
-        run: mkdir -p ./dist
+  #     - name: Prepare dist directory
+  #       run: mkdir -p ./dist
 
-      - name: Compile TypeScript (if needed)
-        run: |
-          if [ -f "tsconfig.json" ]; then
-            npx tsc --build tsconfig.json
-          fi
+  #     - name: Compile TypeScript (if needed)
+  #       run: |
+  #         if [ -f "tsconfig.json" ]; then
+  #           npx tsc --build tsconfig.json
+  #         fi
 
-      # - name: Debug list files before copy
-      #   run: ls -la    
+  #     # - name: Debug list files before copy
+  #     #   run: ls -la    
 
-      # - name: Copy required files
-      #   run: |
-      #     cp package.json ./dist/
-      #     [ -f "key.json" ] && cp "key.json" ./dist/
-      #     [ -f "index.js" ] && cp "index.js" ./dist/
+  #     # - name: Copy required files
+  #     #   run: |
+  #     #     cp package.json ./dist/
+  #     #     [ -f "key.json" ] && cp "key.json" ./dist/
+  #     #     [ -f "index.js" ] && cp "index.js" ./dist/
 
-      - name: Debug dist content
-        run: ls -la ./dist
+  #     - name: Debug dist content
+  #       run: ls -la ./dist
 
-      - name: Create ZIP archive
-        run: cd ./dist && zip -r "../build/function.zip" . -x "*node_modules*"
+  #     - name: Create ZIP archive
+  #       run: cd ./dist && zip -r "../build/function.zip" . -x "*node_modules*"
 
   deploy-master:
     name: Deploy Main Function
-    needs: archive-master
+    needs: build
     if: github.ref == 'refs/heads/master'
     runs-on: ubuntu-latest
 
@@ -162,7 +162,7 @@ jobs:
 
   deploy-shorten:
     name: Deploy Shorten Function
-    needs: archive-shorten
+    needs: build
     if: github.ref == 'refs/heads/shorten'
     runs-on: ubuntu-latest
 
@@ -184,7 +184,7 @@ jobs:
 
   deploy-delete:
     name: Deploy Delete Function
-    needs: archive-delete
+    needs: build
     if: github.ref == 'refs/heads/delete'
     runs-on: ubuntu-latest
 
