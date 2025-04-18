@@ -10,7 +10,7 @@ on:
 
 jobs:
   build:
-    name: Build and Test
+    name: Build
     runs-on: ubuntu-latest
 
     steps:
@@ -27,11 +27,95 @@ jobs:
         run: npm i
 
       - name: Build project
-        run: npm i
+        run: npm run build
+
+  arhive-master:
+    name: Arhive
+    needs: build
+    if: github.ref == 'refs/heads/master'
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Prepare build directory
+        run: |
+          rm -rf ./build ./dist
+          mkdir -p ./build ./dist
+
+      - name: Compile TypeScript (if needed)
+        run: |
+          if [ -f "tsconfig.json" ]; then
+            npx tsc --build tsconfig.json
+          fi
+
+      # - name: Prepare distribution files
+      #   run: |
+      #     cp package.json ./dist/
+      #     [ -f "key.json" ] && cp "key.json" ./dist/
+      #     mv "./dist/${{ steps.func-params.outputs.SOURCE_FILE }}" ./dist/index.js
+
+      - name: Create ZIP archive
+        run: |
+          cd ./dist && zip -r "../build/redirect.zip" . -x "*node_modules*"   
+
+  arhive-shorten:
+    name: Arhive
+    needs: build
+    if: github.ref == 'refs/heads/shorten'
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Prepare build directory
+        run: |
+          rm -rf ./build ./dist
+          mkdir -p ./build ./dist
+
+      - name: Compile TypeScript (if needed)
+        run: |
+          if [ -f "tsconfig.json" ]; then
+            npx tsc --build tsconfig.json
+          fi
+
+      # - name: Prepare distribution files
+      #   run: |
+      #     cp package.json ./dist/
+      #     [ -f "key.json" ] && cp "key.json" ./dist/
+      #     mv "./dist/${{ steps.func-params.outputs.SOURCE_FILE }}" ./dist/index.js
+
+      - name: Create ZIP archive
+        run: |
+          cd ./dist && zip -r "../build/create.zip" . -x "*node_modules*"   
+
+  arhive-delete:
+    name: Arhive
+    needs: build
+    if: github.ref == 'refs/heads/delete'
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Prepare build directory
+        run: |
+          rm -rf ./build ./dist
+          mkdir -p ./build ./dist
+
+      - name: Compile TypeScript (if needed)
+        run: |
+          if [ -f "tsconfig.json" ]; then
+            npx tsc --build tsconfig.json
+          fi
+
+      # - name: Prepare distribution files
+      #   run: |
+      #     cp package.json ./dist/
+      #     [ -f "key.json" ] && cp "key.json" ./dist/
+      #     mv "./dist/${{ steps.func-params.outputs.SOURCE_FILE }}" ./dist/index.js
+
+      - name: Create ZIP archive
+        run: |
+          cd ./dist && zip -r "../build/delete.zip" . -x "*node_modules*"         
 
   deploy-master:
     name: Deploy Main Function
-    needs: build
+    needs: arhive-master
     if: github.ref == 'refs/heads/master'
     runs-on: ubuntu-latest
 
@@ -39,21 +123,21 @@ jobs:
       - name: Deploy Main Function
         uses: yc-actions/yc-sls-function@v1.0.1
         with:
-          yc-sa-json-credentials: ${{ secrets.YC_SA_JSON_CREDENTIALS }}
           folder-id: ${{ secrets.FOLDER_ID }}
           function-name: 'redirect-func'
           runtime: 'nodejs16'
-          memory: '128Mb'
-          execution-timeout: '10s'
+          memory: '256Mb'
+          source-path: './build/redirect.zip'
+          execution-timeout: '5s'
+          service-account-id:  ${{ secrets.SERVICE_ACCOUNT_ID }}
           entrypoint: 'index.handler'
           environment: |
             DATABASE=${{ secrets.DB_NAME }}
             ENDPOINT=${{ secrets.DB_ENDPOINT }}
-            IAM_TOKEN=${{ secrets.IAM_TOKEN }}
 
   deploy-shorten:
     name: Deploy Shorten Function
-    needs: build
+    needs: arhive-shorten
     if: github.ref == 'refs/heads/shorten'
     runs-on: ubuntu-latest
 
@@ -61,21 +145,21 @@ jobs:
       - name: Deploy Shorten Function
         uses: yc-actions/yc-sls-function@v1.0.1
         with:
-          yc-sa-json-credentials: ${{ secrets.YC_SA_JSON_CREDENTIALS }}
           folder-id: ${{ secrets.FOLDER_ID }}
           function-name: 'create-func'
           runtime: 'nodejs16'
-          memory: '128Mb'
-          execution-timeout: '10s'
+          memory: '256Mb'
+          execution-timeout: '5s'
+          source-path: './build/create.zip'
+          service-account-id:  ${{ secrets.SERVICE_ACCOUNT_ID }}
           entrypoint: 'index.handler'
           environment: |
             DATABASE=${{ secrets.DB_NAME }}
             ENDPOINT=${{ secrets.DB_ENDPOINT }}
-            IAM_TOKEN=${{ secrets.IAM_TOKEN }}
 
   deploy-delete:
     name: Deploy Delete Function
-    needs: build
+    needs: arhive-delete
     if: github.ref == 'refs/heads/delete'
     runs-on: ubuntu-latest
 
@@ -83,14 +167,15 @@ jobs:
       - name: Deploy Delete Function
         uses: yc-actions/yc-sls-function@v1.0.1
         with:
-          yc-sa-json-credentials: ${{ secrets.YC_SA_JSON_CREDENTIALS }}
           folder-id: ${{ secrets.FOLDER_ID }}
           function-name: 'delete-func'
           runtime: 'nodejs16'
-          memory: '128Mb'
-          execution-timeout: '10s'
+          memory: '256Mb'
+          execution-timeout: '5s'
+          source-path: './build/delete.zip'
+          service-account-id:  ${{ secrets.SERVICE_ACCOUNT_ID }}
           entrypoint: 'index.handler'
           environment: |
             DATABASE=${{ secrets.DB_NAME }}
             ENDPOINT=${{ secrets.DB_ENDPOINT }}
-            IAM_TOKEN=${{ secrets.IAM_TOKEN }}
+           
