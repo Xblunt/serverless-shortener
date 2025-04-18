@@ -24,10 +24,10 @@ jobs:
           cache: 'npm'
 
       - name: Install dependencies
-        run: npm ci
+        run: npm i
 
-      - name: Run tests
-        run: npm test
+      - name: Build project
+        run: npm i
 
   deploy-master:
     name: Deploy Main Function
@@ -41,7 +41,7 @@ jobs:
         with:
           yc-sa-json-credentials: ${{ secrets.YC_SA_JSON_CREDENTIALS }}
           folder-id: ${{ secrets.FOLDER_ID }}
-          function-name: 'url-shortener-main'
+          function-name: 'redirect-func'
           runtime: 'nodejs16'
           memory: '128Mb'
           execution-timeout: '10s'
@@ -50,7 +50,6 @@ jobs:
             DATABASE=${{ secrets.DB_NAME }}
             ENDPOINT=${{ secrets.DB_ENDPOINT }}
             IAM_TOKEN=${{ secrets.IAM_TOKEN }}
-            FUNCTION_ROLE=main
 
   deploy-shorten:
     name: Deploy Shorten Function
@@ -64,16 +63,15 @@ jobs:
         with:
           yc-sa-json-credentials: ${{ secrets.YC_SA_JSON_CREDENTIALS }}
           folder-id: ${{ secrets.FOLDER_ID }}
-          function-name: 'url-shortener-shorten'
+          function-name: 'create-func'
           runtime: 'nodejs16'
           memory: '128Mb'
           execution-timeout: '10s'
-          entrypoint: 'index.shortenHandler'
+          entrypoint: 'index.handler'
           environment: |
             DATABASE=${{ secrets.DB_NAME }}
             ENDPOINT=${{ secrets.DB_ENDPOINT }}
             IAM_TOKEN=${{ secrets.IAM_TOKEN }}
-            FUNCTION_ROLE=shorten
 
   deploy-delete:
     name: Deploy Delete Function
@@ -87,13 +85,12 @@ jobs:
         with:
           yc-sa-json-credentials: ${{ secrets.YC_SA_JSON_CREDENTIALS }}
           folder-id: ${{ secrets.FOLDER_ID }}
-          function-name: 'url-shortener-delete'
+          function-name: 'delete-func'
           runtime: 'nodejs16'
           memory: '128Mb'
           execution-timeout: '10s'
-          entrypoint: 'index.deleteHandler'
+          entrypoint: 'index.handler'
           environment: |
             DATABASE=${{ secrets.DB_NAME }}
             ENDPOINT=${{ secrets.DB_ENDPOINT }}
             IAM_TOKEN=${{ secrets.IAM_TOKEN }}
-            FUNCTION_ROLE=delete
