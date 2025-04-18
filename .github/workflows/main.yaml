@@ -29,6 +29,9 @@ jobs:
       - name: Build project
         run: npm run build
 
+      - name: Make zipper.sh executable
+        run: chmod +x zipper.sh  
+
       - name: Run zipper
         run: ./zipper.sh
 
