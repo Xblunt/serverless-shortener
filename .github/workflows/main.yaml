@@ -48,6 +48,9 @@ jobs:
             npx tsc --build tsconfig.json
           fi
 
+      - name: Debug list files before copy
+        run: ls -la
+
       - name: Copy required files
         run: |
           cp package.json ./dist/
@@ -80,6 +83,9 @@ jobs:
             npx tsc --build tsconfig.json
           fi
 
+      - name: Debug list files before copy
+        run: ls -la
+
       - name: Copy required files
         run: |
           cp package.json ./dist/
@@ -110,6 +116,9 @@ jobs:
           if [ -f "tsconfig.json" ]; then
             npx tsc --build tsconfig.json
           fi
+
+      - name: Debug list files before copy
+        run: ls -la    
 
       - name: Copy required files
         run: |
