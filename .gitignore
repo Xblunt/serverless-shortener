@@ -1,6 +1,4 @@
-.idea
-node_modules
-dist
-build
-key.json
-service_account_key_file.json
+.idea/
+.env
+node_modules/
+scripts/
