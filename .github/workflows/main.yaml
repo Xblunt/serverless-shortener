@@ -29,12 +29,6 @@ jobs:
       - name: Build project
         run: npm run build
 
-      # - name: Make zipper.sh executable
-      #   run: chmod +x zipper.sh  
-
-      # - name: Run zipper
-      #   run: ./zipper.sh
-
   deploy-master:
     name: Deploy Main Function
     needs: build
@@ -49,7 +43,7 @@ jobs:
           folder-id: ${{ secrets.FOLDER_ID }}
           function-name: 'redirect-func'
           runtime: 'nodejs16'
-          memory: '256Mb'
+          memory: '256m'
           source-path: './build/function.zip'
           execution-timeout: '5s'
           service-account-id: ${{ secrets.SERVICE_ACCOUNT_ID }}
@@ -72,8 +66,8 @@ jobs:
           folder-id: ${{ secrets.FOLDER_ID }}
           function-name: 'create-func'
           runtime: 'nodejs16'
-          memory: '256Mb'
-          execution-timeout: '10s'
+          memory: '256m'
+          execution-timeout: '15s'
           source-path: './build/function.zip'
           service-account-id: ${{ secrets.SERVICE_ACCOUNT_ID }}
           entrypoint: 'index.handler'
@@ -95,7 +89,7 @@ jobs:
           folder-id: ${{ secrets.FOLDER_ID }}
           function-name: 'delete-func'
           runtime: 'nodejs16'
-          memory: '256Mb'
+          memory: '256m'
           execution-timeout: '10s'
           source-path: './build/function.zip'
           service-account-id: ${{ secrets.SERVICE_ACCOUNT_ID }}
