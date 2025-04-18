@@ -1,0 +1,98 @@
+name: YC Node.js Functions CI/CD Pipeline
+
+on:
+  push:
+    branches: 
+      - master
+      - shorten
+      - delete
+  workflow_dispatch:
+
+jobs:
+  build:
+    name: Build and Test
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js 16
+        uses: actions/setup-node@v3
+        with:
+          node-version: '16'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm i
+
+
+
+  deploy-master:
+    name: Deploy Main Function
+    needs: build
+    if: github.ref == 'refs/heads/master'
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Deploy Main Function
+        uses: yc-actions/yc-sls-function@v1.0.1
+        with:
+          yc-sa-json-credentials: ${{ secrets.YC_SA_JSON_CREDENTIALS }}
+          folder-id: ${{ secrets.FOLDER_ID }}
+          function-name: 'url-shortener-main'
+          runtime: 'nodejs16'
+          memory: '128Mb'
+          execution-timeout: '10s'
+          entrypoint: 'index.handler'
+          environment: |
+            DATABASE=${{ secrets.DB_NAME }}
+            ENDPOINT=${{ secrets.DB_ENDPOINT }}
+            IAM_TOKEN=${{ secrets.IAM_TOKEN }}
+            FUNCTION_ROLE=main
+
+  deploy-shorten:
+    name: Deploy Shorten Function
+    needs: build
+    if: github.ref == 'refs/heads/shorten'
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Deploy Shorten Function
+        uses: yc-actions/yc-sls-function@v1.0.1
+        with:
+          yc-sa-json-credentials: ${{ secrets.YC_SA_JSON_CREDENTIALS }}
+          folder-id: ${{ secrets.FOLDER_ID }}
+          function-name: 'url-shortener-shorten'
+          runtime: 'nodejs16'
+          memory: '128Mb'
+          execution-timeout: '10s'
+          entrypoint: 'index.shortenHandler'
+          environment: |
+            DATABASE=${{ secrets.DB_NAME }}
+            ENDPOINT=${{ secrets.DB_ENDPOINT }}
+            IAM_TOKEN=${{ secrets.IAM_TOKEN }}
+            FUNCTION_ROLE=shorten
+
+  deploy-delete:
+    name: Deploy Delete Function
+    needs: build
+    if: github.ref == 'refs/heads/delete'
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Deploy Delete Function
+        uses: yc-actions/yc-sls-function@v1.0.1
+        with:
+          yc-sa-json-credentials: ${{ secrets.YC_SA_JSON_CREDENTIALS }}
+          folder-id: ${{ secrets.FOLDER_ID }}
+          function-name: 'url-shortener-delete'
+          runtime: 'nodejs16'
+          memory: '128Mb'
+          execution-timeout: '10s'
+          entrypoint: 'index.deleteHandler'
+          environment: |
+            DATABASE=${{ secrets.DB_NAME }}
+            ENDPOINT=${{ secrets.DB_ENDPOINT }}
+            IAM_TOKEN=${{ secrets.IAM_TOKEN }}
+            FUNCTION_ROLE=delete
