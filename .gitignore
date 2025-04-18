@@ -1,11 +1,7 @@
 .idea/
-
 .env
-
 node_modules/
-
 key.json
-
 build-create.sh
 create-func.sh
 create-ver.sh
