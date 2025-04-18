@@ -51,6 +51,7 @@ jobs:
           environment: |
             DATABASE=${{ secrets.DB_NAME }}
             ENDPOINT=${{ secrets.DB_ENDPOINT }}
+            IAM_TOKEN=${{ secrets.IAM_TOKEN }}
 
   deploy-shorten:
     name: Deploy Shorten Function
@@ -74,6 +75,7 @@ jobs:
           environment: |
             DATABASE=${{ secrets.DB_NAME }}
             ENDPOINT=${{ secrets.DB_ENDPOINT }}
+            IAM_TOKEN=${{ secrets.IAM_TOKEN }}
 
   deploy-delete:
     name: Deploy Delete Function
@@ -97,3 +99,4 @@ jobs:
           environment: |
             DATABASE=${{ secrets.DB_NAME }}
             ENDPOINT=${{ secrets.DB_ENDPOINT }}
+            IAM_TOKEN=${{ secrets.IAM_TOKEN }}
