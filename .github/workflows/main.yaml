@@ -92,9 +92,7 @@ jobs:
         run: |
           [ -f "key.json" ] && cp "key.json" ./dist/
           [ -f "index.js" ] && cp "index.js" ./dist/
-          cp package.json ./dist/
           
-
       - name: Debug dist content
         run: ls -la ./dist
 
