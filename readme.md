@@ -1,0 +1,1 @@
+There are 4 serverless functions implemented here, based on the URL shortener implementation.
