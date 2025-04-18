@@ -36,7 +36,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Deploy Main Function
+      - name: Deploy Redirect Function
         uses: yc-actions/yc-sls-function@v1.0.1
         with:
           yc-sa-json-credentials: ${{ secrets.YC_SA_JSON_CREDENTIALS }}
