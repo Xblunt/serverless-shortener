@@ -46,7 +46,7 @@ jobs:
           memory: '256Mb'
           source-path: './build/function.zip'
           execution-timeout: '5s'
-          service-account-id: ${{ secrets.SERVICE_ACCOUNT_ID }}
+          service-account: ${{ secrets.SERVICE_ACCOUNT_ID }}
           entrypoint: 'index.handler'
           environment: |
             DATABASE=${{ secrets.DB_NAME }}
@@ -70,7 +70,7 @@ jobs:
           memory: '256Mb'
           execution-timeout: '15s'
           source-path: './build/function.zip'
-          service-account-id: ${{ secrets.SERVICE_ACCOUNT_ID }}
+          service-account: ${{ secrets.SERVICE_ACCOUNT_ID }}
           entrypoint: 'index.handler'
           environment: |
             DATABASE=${{ secrets.DB_NAME }}
@@ -94,7 +94,7 @@ jobs:
           memory: '256Mb'
           execution-timeout: '10s'
           source-path: './build/function.zip'
-          service-account-id: ${{ secrets.SERVICE_ACCOUNT_ID }}
+          service-account: ${{ secrets.SERVICE_ACCOUNT_ID }}
           entrypoint: 'index.handler'
           environment: |
             DATABASE=${{ secrets.DB_NAME }}
