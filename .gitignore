@@ -1,4 +1,5 @@
 .idea
+.env
 node_modules
 key.json
 build-create.sh
@@ -7,4 +8,5 @@ create-ver.sh
 redirect-ver.sh
 redirect-func.sh
 delete-func.sh
-delete-ver.dist
+delete-ver.sh
+dist
