@@ -48,15 +48,15 @@ jobs:
             npx tsc --build tsconfig.json
           fi
 
-      - name: Debug list files before copy
-        run: ls -la
+      # - name: Debug list files before copy
+      #   run: ls -la
 
-      - name: Copy required files
-        run: |
-          cp package.json ./dist/
-          [ -f "key.json" ] && cp "key.json" ./dist/
-          # Убедись, что index.js находится в ./dist
-          [ -f "index.js" ] && cp "index.js" ./dist/
+      # - name: Copy required files
+      #   run: |
+      #     cp package.json ./dist/
+      #     [ -f "key.json" ] && cp "key.json" ./dist/
+      #     # Убедись, что index.js находится в ./dist
+      #     [ -f "index.js" ] && cp "index.js" ./dist/
 
       - name: Debug dist content
         run: ls -la ./dist
@@ -83,14 +83,14 @@ jobs:
             npx tsc --build tsconfig.json
           fi
 
-      - name: Debug list files before copy
-        run: ls -la
+      # - name: Debug list files before copy
+      #   run: ls -la
 
-      - name: Copy required files
-        run: |
-          cp package.json ./dist/
-          [ -f "key.json" ] && cp "key.json" ./dist/
-          [ -f "index.js" ] && cp "index.js" ./dist/
+      # - name: Copy required files
+      #   run: |
+      #     cp package.json ./dist/
+      #     [ -f "key.json" ] && cp "key.json" ./dist/
+      #     [ -f "index.js" ] && cp "index.js" ./dist/
 
       - name: Debug dist content
         run: ls -la ./dist
@@ -117,14 +117,14 @@ jobs:
             npx tsc --build tsconfig.json
           fi
 
-      - name: Debug list files before copy
-        run: ls -la    
+      # - name: Debug list files before copy
+      #   run: ls -la    
 
-      - name: Copy required files
-        run: |
-          cp package.json ./dist/
-          [ -f "key.json" ] && cp "key.json" ./dist/
-          [ -f "index.js" ] && cp "index.js" ./dist/
+      # - name: Copy required files
+      #   run: |
+      #     cp package.json ./dist/
+      #     [ -f "key.json" ] && cp "key.json" ./dist/
+      #     [ -f "index.js" ] && cp "index.js" ./dist/
 
       - name: Debug dist content
         run: ls -la ./dist
