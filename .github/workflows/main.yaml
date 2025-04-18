@@ -202,7 +202,7 @@ jobs:
           function-name: 'delete-func'
           runtime: 'nodejs16'
           memory: '256Mb'
-          execution-timeout: '5s'
+          execution-timeout: '10s'
           source-path: './build/function.zip'
           service-account-id: ${{ secrets.SERVICE_ACCOUNT_ID }}
           entrypoint: 'index.handler'
