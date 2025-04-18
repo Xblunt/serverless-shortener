@@ -29,6 +29,9 @@ jobs:
       - name: Build project
         run: npm run build
 
+      - name: Postbuild project
+        run: npm run postbuild
+
   archive-master:
     name: Archive Master
     needs: build
@@ -85,14 +88,16 @@ jobs:
 
 
 
-      - name: Debug list files before copy
-        run: ls -la
+      # - name: Debug list files before copy
+      #   run: ls -la
 
-      - name: Copy required files
-        run: |
-          [ -f "key.json" ] && cp "key.json" ./dist/
-          [ -f "index.js" ] && cp "index.js" ./dist/
+      # - name: Copy required files
+      #   run: |
+      #     [ -f "key.json" ] && cp "key.json" ./dist/
+      #      [ -f "package.json" ] && cp "package.json" ./dist/
+
           
+
       - name: Debug dist content
         run: ls -la ./dist
 
