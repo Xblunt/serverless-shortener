@@ -151,6 +151,7 @@ jobs:
       - name: Deploy Main Function
         uses: yc-actions/yc-sls-function@v1.0.1
         with:
+          yc-sa-json-credentials: ${{ secrets.YC_SA_JSON_CREDENTIALS }}
           folder-id: ${{ secrets.FOLDER_ID }}
           function-name: 'redirect-func'
           runtime: 'nodejs16'
@@ -173,6 +174,7 @@ jobs:
       - name: Deploy Shorten Function
         uses: yc-actions/yc-sls-function@v1.0.1
         with:
+          yc-sa-json-credentials: ${{ secrets.YC_SA_JSON_CREDENTIALS }}
           folder-id: ${{ secrets.FOLDER_ID }}
           function-name: 'create-func'
           runtime: 'nodejs16'
@@ -195,6 +197,7 @@ jobs:
       - name: Deploy Delete Function
         uses: yc-actions/yc-sls-function@v1.0.1
         with:
+          yc-sa-json-credentials: ${{ secrets.YC_SA_JSON_CREDENTIALS }}
           folder-id: ${{ secrets.FOLDER_ID }}
           function-name: 'delete-func'
           runtime: 'nodejs16'
