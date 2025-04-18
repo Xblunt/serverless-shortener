@@ -2,20 +2,22 @@ name: YC Node.js Functions CI/CD Pipeline
 
 on:
   push:
-    branches: [master, shorten, delete]
+    branches: 
+      - master
+      - shorten
+      - delete
   workflow_dispatch:
 
 jobs:
   build:
-    name: Build and Compile
+    name: Build
     runs-on: ubuntu-latest
-    outputs:
-      build-dir: ${{ steps.set-output.outputs.build-dir }}
 
     steps:
-      - uses: actions/checkout@v4
-      
-      - name: Setup Node.js 16
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js 16
         uses: actions/setup-node@v3
         with:
           node-version: '16'
@@ -27,88 +29,160 @@ jobs:
       - name: Build project
         run: npm run build
 
-      - name: Prepare distribution files
-        run: |
-          mkdir -p dist
-          cp package.json dist/
-          cp -r src/*.js dist/
-          [ -f key.json ] && cp key.json dist/
-
-      - name: Upload artifacts
-        uses: actions/upload-artifact@v3
-        with:
-          name: build-artifacts
-          path: dist/
-
-  archive:
-    name: Create Deployment Package
+  archive-master:
+    name: Archive Master
     needs: build
+    if: github.ref == 'refs/heads/master'
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        branch: [master, shorten, delete]
-        include:
-          - branch: master
-            zip_name: redirect.zip
-          - branch: shorten
-            zip_name: create.zip
-          - branch: delete
-            zip_name: delete.zip
-    if: github.ref == format('refs/heads/{0}', matrix.branch)
 
     steps:
-      - name: Download artifacts
-        uses: actions/download-artifact@v3
-        with:
-          name: build-artifacts
-          path: dist/
+      - name: Clean previous builds
+        run: rm -rf ./build && mkdir -p ./build
+
+      - name: Prepare dist directory
+        run: mkdir -p ./dist
+
+      - name: Compile TypeScript (if needed)
+        run: |
+          if [ -f "tsconfig.json" ]; then
+            npx tsc --build tsconfig.json
+          fi
+
+      - name: Copy required files
+        run: |
+          cp package.json ./dist/
+          [ -f "key.json" ] && cp "key.json" ./dist/
+          # Убедись, что index.js находится в ./dist
+          [ -f "index.js" ] && cp "index.js" ./dist/
+
+      - name: Debug dist content
+        run: ls -la ./dist
 
       - name: Create ZIP archive
-        run: |
-          mkdir -p build
-          cd dist && zip -r "../build/${{ matrix.zip_name }}" . -x "*node_modules*"
+        run: cd ./dist && zip -r "../build/function.zip" . -x "*node_modules*"
 
-      - name: Upload ZIP package
-        uses: actions/upload-artifact@v3
-        with:
-          name: ${{ matrix.zip_name }}
-          path: build/${{ matrix.zip_name }}
-
-  deploy:
-    name: Deploy Function
-    needs: archive
+  archive-shorten:
+    name: Archive Shorten
+    needs: build
+    if: github.ref == 'refs/heads/shorten'
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        branch: [master, shorten, delete]
-        include:
-          - branch: master
-            zip_name: redirect.zip
-            function_name: redirect-func
-          - branch: shorten
-            zip_name: create.zip
-            function_name: create-func
-          - branch: delete
-            zip_name: delete.zip
-            function_name: delete-func
-    if: github.ref == format('refs/heads/{0}', matrix.branch)
 
     steps:
-      - name: Download ZIP package
-        uses: actions/download-artifact@v3
-        with:
-          name: ${{ matrix.zip_name }}
-          path: build/
+      - name: Clean previous builds
+        run: rm -rf ./build && mkdir -p ./build
 
-      - name: Deploy to Yandex Cloud
+      - name: Prepare dist directory
+        run: mkdir -p ./dist
+
+      - name: Compile TypeScript (if needed)
+        run: |
+          if [ -f "tsconfig.json" ]; then
+            npx tsc --build tsconfig.json
+          fi
+
+      - name: Copy required files
+        run: |
+          cp package.json ./dist/
+          [ -f "key.json" ] && cp "key.json" ./dist/
+          [ -f "index.js" ] && cp "index.js" ./dist/
+
+      - name: Debug dist content
+        run: ls -la ./dist
+
+      - name: Create ZIP archive
+        run: cd ./dist && zip -r "../build/function.zip" . -x "*node_modules*"
+
+  archive-delete:
+    name: Archive Delete
+    needs: build
+    if: github.ref == 'refs/heads/delete'
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Clean previous builds
+        run: rm -rf ./build && mkdir -p ./build
+
+      - name: Prepare dist directory
+        run: mkdir -p ./dist
+
+      - name: Compile TypeScript (if needed)
+        run: |
+          if [ -f "tsconfig.json" ]; then
+            npx tsc --build tsconfig.json
+          fi
+
+      - name: Copy required files
+        run: |
+          cp package.json ./dist/
+          [ -f "key.json" ] && cp "key.json" ./dist/
+          [ -f "index.js" ] && cp "index.js" ./dist/
+
+      - name: Debug dist content
+        run: ls -la ./dist
+
+      - name: Create ZIP archive
+        run: cd ./dist && zip -r "../build/function.zip" . -x "*node_modules*"
+
+  deploy-master:
+    name: Deploy Main Function
+    needs: archive-master
+    if: github.ref == 'refs/heads/master'
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Deploy Main Function
         uses: yc-actions/yc-sls-function@v1.0.1
         with:
           folder-id: ${{ secrets.FOLDER_ID }}
-          function-name: ${{ matrix.function_name }}
+          function-name: 'redirect-func'
+          runtime: 'nodejs16'
+          memory: '256Mb'
+          source-path: './build/function.zip'
+          execution-timeout: '5s'
+          service-account-id: ${{ secrets.SERVICE_ACCOUNT_ID }}
+          entrypoint: 'index.handler'
+          environment: |
+            DATABASE=${{ secrets.DB_NAME }}
+            ENDPOINT=${{ secrets.DB_ENDPOINT }}
+
+  deploy-shorten:
+    name: Deploy Shorten Function
+    needs: archive-shorten
+    if: github.ref == 'refs/heads/shorten'
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Deploy Shorten Function
+        uses: yc-actions/yc-sls-function@v1.0.1
+        with:
+          folder-id: ${{ secrets.FOLDER_ID }}
+          function-name: 'create-func'
           runtime: 'nodejs16'
           memory: '256Mb'
           execution-timeout: '5s'
-          source-path: ./build/${{ matrix.zip_name }}
+          source-path: './build/function.zip'
+          service-account-id: ${{ secrets.SERVICE_ACCOUNT_ID }}
+          entrypoint: 'index.handler'
+          environment: |
+            DATABASE=${{ secrets.DB_NAME }}
+            ENDPOINT=${{ secrets.DB_ENDPOINT }}
+
+  deploy-delete:
+    name: Deploy Delete Function
+    needs: archive-delete
+    if: github.ref == 'refs/heads/delete'
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Deploy Delete Function
+        uses: yc-actions/yc-sls-function@v1.0.1
+        with:
+          folder-id: ${{ secrets.FOLDER_ID }}
+          function-name: 'delete-func'
+          runtime: 'nodejs16'
+          memory: '256Mb'
+          execution-timeout: '5s'
+          source-path: './build/function.zip'
           service-account-id: ${{ secrets.SERVICE_ACCOUNT_ID }}
           entrypoint: 'index.handler'
           environment: |
